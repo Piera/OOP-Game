@@ -38,8 +38,13 @@ class GreenGem(Gem):
 
     def interact(self, player):
         player.inventory.append(self)
-        GAME_BOARD.draw_msg("You have special jumping powers! Press 'j' to jump!")
+        GAME_BOARD.draw_msg("You have special jumping powers! Hold down SHIFT key to jump!")
         player.JUMP_POWER = True
+
+        badguy = BadGuy()
+        self.board.register(badguy)
+        self.board.set_el(0, 3, badguy)
+
 
 class Chest(GameElement):
     IMAGE = "Chest"
@@ -61,6 +66,22 @@ class Door(GameElement):
         if player.DOOR_KEY and self.IMAGE == "DoorClosed":
             GAME_BOARD.draw_msg("You have opened the door!")
             self.change_image("DoorOpen")
+
+class BadGuy(GameElement):
+    IMAGE = 'Horns'
+    direction = 1
+
+    def update(self, dt):
+
+        next_x = self.x + self.direction
+
+        if next_x < 0 or next_x >= self.board.width:
+            self.direction *= -1
+            next_x = self.x
+
+        self.board.del_el(self.x, self.y)
+        self.board.set_el(next_x, self.y, self)
+
 
 class Character(GameElement):
     IMAGE = "Girl"
