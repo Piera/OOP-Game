@@ -20,10 +20,12 @@ class Rock(GameElement):
 class Gem(GameElement):
     IMAGE = "BlueGem"
     SOLID = False
+    DOOR_KEY = True
 
     def interact(self, player):
         player.inventory.append(self)
         GAME_BOARD.draw_msg("You just acquired a gem! You have %d items!"%(len(player.inventory)))
+        player.DOOR_KEY = True
 
 class Chest(GameElement):
     IMAGE = "Chest"
@@ -39,10 +41,18 @@ class Door(GameElement):
     SOLID = True
 
     def interact(self, player):
-        pass
+        if self.IMAGE == "DoorOpen":
+            self.SOLID = False
+        if player.DOOR_KEY and self.IMAGE == "DoorClosed":
+            GAME_BOARD.draw_msg("You have opened the door!")
+            self.change_image("DoorOpen")
+      
+            
+
 
 class Character(GameElement):
     IMAGE = "Girl"
+    DOOR_KEY = False
 
     def __init__(self):
         GameElement.__init__(self)
