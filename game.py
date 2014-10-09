@@ -71,19 +71,25 @@ class Character(GameElement):
         GameElement.__init__(self)
         self.inventory = []
 
-    def next_pos(self, direction):
+    def next_pos(self, direction, speed=1):
         if direction == "up":
-            return (self.x, self.y-1)
+            return (self.x, self.y-speed)
         elif direction == "down":
-            return (self.x, self.y+1)
+            return (self.x, self.y+speed)
         elif direction == "left":
-            return (self.x-1, self.y)
+            return (self.x-speed, self.y)
         elif direction == "right":
-            return (self.x+1, self.y)
+            return (self.x+speed, self.y)
         return None
 
     def keyboard_handler(self, symbol, modifier):
         direction = None
+        print symbol, modifier
+
+        move_by = 1
+        if modifier & key.MOD_SHIFT and self.JUMP_POWER == True:
+            print "you're holding shift"
+            move_by = 2
 
         if symbol == key.UP:
             direction = "up"
@@ -97,7 +103,7 @@ class Character(GameElement):
         self.board.draw_msg("[%s] moves %s" % (self.IMAGE, direction))
 
         if direction:
-            next_location = self.next_pos(direction)
+            next_location = self.next_pos(direction, move_by)
 
             if next_location:
                 next_x = next_location[0]
