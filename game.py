@@ -9,12 +9,16 @@ GAME_BOARD = None
 DEBUG = False
 ######################
 
-GAME_WIDTH = 8
-GAME_HEIGHT = 8
+GAME_WIDTH = 10
+GAME_HEIGHT = 10
 
 #### Put class definitions here ####
 class Rock(GameElement):
     IMAGE = "Rock"
+    SOLID = True
+
+class Wall(GameElement):
+    IMAGE = "Wall"
     SOLID = True
 
 class Gem(GameElement):
@@ -46,9 +50,6 @@ class Door(GameElement):
         if player.DOOR_KEY and self.IMAGE == "DoorClosed":
             GAME_BOARD.draw_msg("You have opened the door!")
             self.change_image("DoorOpen")
-      
-            
-
 
 class Character(GameElement):
     IMAGE = "Girl"
@@ -130,7 +131,6 @@ def initialize():
     GAME_BOARD.register(player)
     GAME_BOARD.set_el(2,2,player)
 
-
     GAME_BOARD.draw_msg("This game is wicked awesome.")
 
     gem = Gem()
@@ -143,5 +143,13 @@ def initialize():
 
     door = Door()
     GAME_BOARD.register(door)
-    GAME_BOARD.set_el(6,6, door)
+    GAME_BOARD.set_el(7,7, door)
+
+    wall_positions = [(5,8), (5,7), (5,9), (6,7), (8,7), (9,7), (9,8), (9,9)]
+    walls = []
+    for pos in wall_positions:
+        wall = Wall()
+        GAME_BOARD.register(wall)
+        GAME_BOARD.set_el(pos[0], pos[1], wall)
+        walls.append(wall)
 
