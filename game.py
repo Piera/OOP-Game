@@ -33,6 +33,13 @@ class Chest(GameElement):
         lost_item = player.inventory.pop()
         GAME_BOARD.draw_msg("Look out!  That chest was evil!  You lost your %s!" % lost_item)
 
+class Door(GameElement):
+    IMAGE = "DoorClosed"
+    SOLID = True
+
+    def interact(self, player):
+     
+
 class Character(GameElement):
     IMAGE = "Girl"
 
@@ -122,4 +129,8 @@ def initialize():
     chest = Chest()
     GAME_BOARD.register(chest)
     GAME_BOARD.set_el(0,7, chest)
+
+    door = Door()
+    GAME_BOARD.register(door)
+    GAME_BOARD.set_el(6,6, door)
 
