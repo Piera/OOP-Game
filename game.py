@@ -31,6 +31,16 @@ class Gem(GameElement):
         GAME_BOARD.draw_msg("You just acquired a gem! You have %d items!"%(len(player.inventory)))
         player.DOOR_KEY = True
 
+class GreenGem(Gem):
+    IMAGE = "GreenGem"
+    SCREEN_KEY = True
+    JUMP_POWER = True
+
+    def interact(self, player):
+        player.inventory.append(self)
+        GAME_BOARD.draw_msg("You have special jumping powers! Press 'j' to jump!")
+        player.JUMP_POWER = True
+
 class Chest(GameElement):
     IMAGE = "Chest"
     SOLID = False
@@ -39,6 +49,7 @@ class Chest(GameElement):
         if player.inventory:
             lost_item = player.inventory.pop()
             GAME_BOARD.draw_msg("Look out!  That chest was evil!  You lost your %s!" % lost_item)
+            player.DOOR_KEY = False
 
 class Door(GameElement):
     IMAGE = "DoorClosed"
@@ -54,6 +65,7 @@ class Door(GameElement):
 class Character(GameElement):
     IMAGE = "Girl"
     DOOR_KEY = False
+    JUMP_POWER = False
 
     def __init__(self):
         GameElement.__init__(self)
@@ -136,6 +148,10 @@ def initialize():
     gem = Gem()
     GAME_BOARD.register(gem)
     GAME_BOARD.set_el(3, 1, gem)
+
+    greengem = GreenGem()
+    GAME_BOARD.register(greengem)
+    GAME_BOARD.set_el(8,8, greengem)
 
     chest = Chest()
     GAME_BOARD.register(chest)
