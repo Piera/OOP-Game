@@ -25,6 +25,14 @@ class Gem(GameElement):
         player.inventory.append(self)
         GAME_BOARD.draw_msg("You just acquired a gem! You have %d items!"%(len(player.inventory)))
 
+class Chest(GameElement):
+    IMAGE = "Chest"
+    SOLID = False
+
+    def interact(self, player):
+        lost_item = player.inventory.pop()
+        GAME_BOARD.draw_msg("Look out!  That chest was evil!  You lost your %s!" % lost_item)
+
 class Character(GameElement):
     IMAGE = "Girl"
 
@@ -68,6 +76,7 @@ class Character(GameElement):
                     existing_el = self.board.get_el(next_x, next_y)
 
                     if existing_el:
+                        print existing_el
                         existing_el.interact(self)
 
                     if existing_el and existing_el.SOLID:
@@ -109,4 +118,8 @@ def initialize():
     gem = Gem()
     GAME_BOARD.register(gem)
     GAME_BOARD.set_el(3, 1, gem)
+
+    chest = Chest()
+    GAME_BOARD.register(chest)
+    GAME_BOARD.set_el(0,7, chest)
 
