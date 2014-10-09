@@ -30,15 +30,16 @@ class Chest(GameElement):
     SOLID = False
 
     def interact(self, player):
-        lost_item = player.inventory.pop()
-        GAME_BOARD.draw_msg("Look out!  That chest was evil!  You lost your %s!" % lost_item)
+        if player.inventory:
+            lost_item = player.inventory.pop()
+            GAME_BOARD.draw_msg("Look out!  That chest was evil!  You lost your %s!" % lost_item)
 
 class Door(GameElement):
     IMAGE = "DoorClosed"
     SOLID = True
 
     def interact(self, player):
-     
+        pass
 
 class Character(GameElement):
     IMAGE = "Girl"
