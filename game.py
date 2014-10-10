@@ -70,17 +70,19 @@ class Door(GameElement):
 class BadGuy(GameElement):
     IMAGE = 'Horns'
     direction = 1
+    call_count = 0
 
     def update(self, dt):
+        if self.call_count % 3 == 0:
+            next_x = self.x + self.direction
 
-        next_x = self.x + self.direction
+            if next_x < 0 or next_x >= self.board.width:
+                self.direction *= -1
+                next_x = self.x
 
-        if next_x < 0 or next_x >= self.board.width:
-            self.direction *= -1
-            next_x = self.x
-
-        self.board.del_el(self.x, self.y)
-        self.board.set_el(next_x, self.y, self)
+            self.board.del_el(self.x, self.y)
+            self.board.set_el(next_x, self.y, self)
+        self.call_count += 1
 
 
 class Character(GameElement):
