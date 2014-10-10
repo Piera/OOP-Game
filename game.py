@@ -47,7 +47,7 @@ class GreenGem(Gem):
 
         badguy = BadGuy()
         self.board.register(badguy)
-        self.board.set_el(0, 3, badguy)
+        self.board.set_el(0, 4, badguy)
 
 
 class Chest(GameElement):
@@ -75,6 +75,7 @@ class BadGuy(GameElement):
     IMAGE = 'Horns'
     direction = 1
     call_count = 0
+    hover = None
 
 
     def update(self, dt):
@@ -85,19 +86,21 @@ class BadGuy(GameElement):
                 self.direction *= -1
                 next_x = self.x
 
+            character_in_path = self.board.get_el(next_x, 4)
+            if isinstance(character_in_path, Character):
+                character_in_path.interact(self)
+
             self.board.del_el(self.x, self.y)
             self.board.set_el(next_x, self.y, self)
         self.call_count += 1
 
     def interact(self, player):
-        player.thingimon = self
-        print player.thingimon
-        for item_index in range(len(player.inventory)):
-            if isinstance(player.inventory[item_index], GreenGem):
-                del player.inventory[item_index]
-        player.JUMP_POWER = False
-        self.board.draw_msg("The bad guy stole your green gem! Boo hoo")
-        self.board.set_el(self.x, self.y, player)
+        print "The player is interacting with the badguy"
+        # for item_index in range(len(player.inventory)):
+        #     if isinstance(player.inventory[item_index], GreenGem):
+        #         del player.inventory[item_index]
+        # player.JUMP_POWER = False
+        # self.board.draw_msg("The bad guy stole your green gem! Boo hoo")
 
 
 class Character(GameElement):
@@ -109,6 +112,11 @@ class Character(GameElement):
     def __init__(self):
         GameElement.__init__(self)
         self.inventory = []
+
+    def interact(self, badguy):
+        print "The badguy interacts with the player"
+        badguy.hover = self
+        print "The badguy has run into", badguy.hover
 
     def next_pos(self, direction, speed=1):
         if direction == "up":
