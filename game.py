@@ -87,10 +87,16 @@ class BadGuy(GameElement):
                 next_x = self.x
 
             character_in_path = self.board.get_el(next_x, 4)
+
+            hover = self.hover
+
             if isinstance(character_in_path, Character):
                 character_in_path.interact(self)
 
             self.board.del_el(self.x, self.y)
+            if hover:
+                self.board.set_el(self.x, self.y, hover)
+                self.hover = None
             self.board.set_el(next_x, self.y, self)
         self.call_count += 1
 
