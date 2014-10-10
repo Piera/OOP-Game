@@ -165,13 +165,15 @@ class Character(GameElement):
             direction = "left"
         elif symbol == key.RIGHT:
             direction = "right"
+        elif symbol == key.Q:
+            sys.exit("Game over!")
         self.MOVE_COUNT += 1
 
         if self.MOVE_COUNT < 30:    
             self.board.draw_msg("[%s] moves %s" % (self.IMAGE, direction))
         else:    
             direction = None
-            self.board.draw_msg("You lost! You only get 30 keystrokes!")
+            self.board.draw_msg("You lost! You only get 30 keystrokes! Press Q to quit.")
         if direction:
             next_location = self.next_pos(direction, move_by)
 
