@@ -85,12 +85,11 @@ class BadGuy(GameElement):
         self.call_count += 1
 
     def interact(self, player):
-        # robbed_item = del player.inventory[greengem]
-        print player.inventory
-        for item in player.inventory:
-            if isinstance(item, GreenGem):
-                del item
-        print player.inventory
+        for item_index in range(len(player.inventory)):
+            if isinstance(player.inventory[item_index], GreenGem):
+                del player.inventory[item_index]
+        player.JUMP_POWER = False
+        self.board.draw_msg("The bad guy stole your green gem! Boo hoo")
 
 
 
