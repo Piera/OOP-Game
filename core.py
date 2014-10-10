@@ -14,6 +14,9 @@ class GameElement(object):
     def interact(self, player):
         pass
 
+    def evil_interact(self, player):
+        pass
+
     def __str__(self):
         return "<%s located at %r, %r>"%(type(self).__name__, self.x, self.y)
 

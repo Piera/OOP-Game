@@ -17,6 +17,10 @@ class Rock(GameElement):
     IMAGE = "Rock"
     SOLID = True
 
+    def interact(self, player):
+        if not self.SOLID:
+            player.hover = self
+
 class Wall(GameElement):
     IMAGE = "Wall"
     SOLID = True
@@ -72,6 +76,7 @@ class BadGuy(GameElement):
     direction = 1
     call_count = 0
 
+
     def update(self, dt):
         if self.call_count % 3 == 0:
             next_x = self.x + self.direction
@@ -85,18 +90,21 @@ class BadGuy(GameElement):
         self.call_count += 1
 
     def interact(self, player):
+        player.thingimon = self
+        print player.thingimon
         for item_index in range(len(player.inventory)):
             if isinstance(player.inventory[item_index], GreenGem):
                 del player.inventory[item_index]
         player.JUMP_POWER = False
         self.board.draw_msg("The bad guy stole your green gem! Boo hoo")
-
+        self.board.set_el(self.x, self.y, player)
 
 
 class Character(GameElement):
     IMAGE = "Girl"
     DOOR_KEY = False
     JUMP_POWER = False
+    hover = None
 
     def __init__(self):
         GameElement.__init__(self)
@@ -143,6 +151,8 @@ class Character(GameElement):
                 if 0 <= next_x < GAME_WIDTH and 0 <= next_y < GAME_HEIGHT: 
                     existing_el = self.board.get_el(next_x, next_y)
 
+                    hover = self.hover
+
                     if existing_el:
                         print existing_el
                         existing_el.interact(self)
@@ -151,9 +161,13 @@ class Character(GameElement):
                         self.board.draw_msg("There's something in my way!")
                     elif existing_el is None or not existing_el.SOLID:
                         self.board.del_el(self.x, self.y)
+                        if hover:
+                            self.board.set_el(self.x, self.y, hover)
+                            self.hover = None
                         self.board.set_el(next_x, next_y, self)
                 else:
                     self.board.draw_msg("I can't go any farther!")
+
 
 
 ####   End class definitions    ####
