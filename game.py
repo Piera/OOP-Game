@@ -84,6 +84,15 @@ class BadGuy(GameElement):
             self.board.set_el(next_x, self.y, self)
         self.call_count += 1
 
+    def interact(self, player):
+        # robbed_item = del player.inventory[greengem]
+        print player.inventory
+        for item in player.inventory:
+            if isinstance(item, GreenGem):
+                del item
+        print player.inventory
+
+
 
 class Character(GameElement):
     IMAGE = "Girl"
