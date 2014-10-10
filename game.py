@@ -44,21 +44,32 @@ class GreenGem(Gem):
         player.inventory.append(self)
         GAME_BOARD.draw_msg("You have special jumping powers! Hold down SHIFT key to jump!")
         player.JUMP_POWER = True
+        player.CHEST_KEY = True
 
         badguy = BadGuy()
         self.board.register(badguy)
         self.board.set_el(0, 4, badguy)
 
+        walls = [(7,0), (7,1), (7,2), (8,2),(9,2)]
+        for pos in walls:
+            wall = Wall()
+            GAME_BOARD.register(wall)
+            GAME_BOARD.set_el(pos[0], pos[1], wall)
+
 
 class Chest(GameElement):
     IMAGE = "Chest"
-    SOLID = False
+    SOLID = True
 
     def interact(self, player):
-        if player.inventory:
-            lost_item = player.inventory.pop()
-            GAME_BOARD.draw_msg("Look out!  That chest was evil!  You lost your %s!" % lost_item)
-            player.DOOR_KEY = False
+        if player.CHEST_KEY:
+            self.SOLID = False
+            # GAME_BOARD.del_el(badguy.x, badguy.y)
+            GAME_BOARD.draw_msg("You've opened the magical chest and won the game!")
+        # if player.inventory:
+        #     lost_item = player.inventory.pop()
+        #     GAME_BOARD.draw_msg("Look out!  That chest was evil!  You lost your %s!" % lost_item)
+        #     player.DOOR_KEY = False
 
 class Door(GameElement):
     IMAGE = "DoorClosed"
@@ -102,18 +113,15 @@ class BadGuy(GameElement):
 
     def interact(self, player):
         print "The player is interacting with the badguy"
-        # for item_index in range(len(player.inventory)):
-        #     if isinstance(player.inventory[item_index], GreenGem):
-        #         del player.inventory[item_index]
-        # player.JUMP_POWER = False
-        # self.board.draw_msg("The bad guy stole your green gem! Boo hoo")
-
+        # player.hover = self
 
 class Character(GameElement):
     IMAGE = "Girl"
     DOOR_KEY = False
     JUMP_POWER = False
+    CHEST_KEY = False
     hover = None
+    MOVE_COUNT = 0
 
     def __init__(self):
         GameElement.__init__(self)
@@ -123,6 +131,11 @@ class Character(GameElement):
         print "The badguy interacts with the player"
         badguy.hover = self
         print "The badguy has run into", badguy.hover
+        for item_index in range(len(self.inventory)):
+            if isinstance(self.inventory[item_index], GreenGem):
+                del self.inventory[item_index]
+        self.JUMP_POWER = False
+        self.board.draw_msg("The bad guy stole your green gem! Boo hoo")
 
     def next_pos(self, direction, speed=1):
         if direction == "up":
@@ -152,9 +165,13 @@ class Character(GameElement):
             direction = "left"
         elif symbol == key.RIGHT:
             direction = "right"
+        self.MOVE_COUNT += 1
 
-        self.board.draw_msg("[%s] moves %s" % (self.IMAGE, direction))
-
+        if self.MOVE_COUNT < 30:    
+            self.board.draw_msg("[%s] moves %s" % (self.IMAGE, direction))
+        else:    
+            direction = None
+            self.board.draw_msg("You lost! You only get 30 keystrokes!")
         if direction:
             next_location = self.next_pos(direction, move_by)
 
@@ -220,7 +237,7 @@ def initialize():
 
     chest = Chest()
     GAME_BOARD.register(chest)
-    GAME_BOARD.set_el(0,7, chest)
+    GAME_BOARD.set_el(9,0, chest)
 
     door = Door()
     GAME_BOARD.register(door)
