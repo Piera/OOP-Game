@@ -18,6 +18,8 @@ class Rock(GameElement):
     SOLID = True
 
     def interact(self, player):
+        """If the player interacts with the rock and the rock isn't solid, note that
+        the player is hovering over the rock"""
         if not self.SOLID:
             player.hover = self
 
@@ -31,6 +33,8 @@ class Gem(GameElement):
     DOOR_KEY = True
 
     def interact(self, player):
+        """If the player interacts with this gem, add the gem to the inventory, give 
+        player a door key"""
         player.inventory.append(self)
         GAME_BOARD.draw_msg("You just acquired a gem! You have %d items!"%(len(player.inventory)))
         player.DOOR_KEY = True
@@ -41,6 +45,9 @@ class GreenGem(Gem):
     JUMP_POWER = True
 
     def interact(self, player):
+        """If the player interacts with this gem, add it to the inventory. Gives player jump
+        power, and allows them to open the chest. Creates an automatically moving bad guy. Puts
+        walls around the chest"""
         player.inventory.append(self)
         GAME_BOARD.draw_msg("You have special jumping powers! Hold down SHIFT key to jump!")
         player.JUMP_POWER = True
@@ -62,15 +69,11 @@ class Chest(GameElement):
     SOLID = True
 
     def interact(self, player):
+        """If the player iteracts with this chest and they have the key, player wins the game"""
         if player.CHEST_KEY:
             self.SOLID = False
-            # GAME_BOARD.del_el(badguy.x, badguy.y)
-            GAME_BOARD.draw_msg("You've opened the magical chest and won the game!")
-        # if player.inventory:
-        #     lost_item = player.inventory.pop()
-        #     GAME_BOARD.draw_msg("Look out!  That chest was evil!  You lost your %s!" % lost_item)
-        #     player.DOOR_KEY = False
-
+            GAME_BOARD.draw_msg("You've opened the magical chest and won the game! Press Q to quit")
+            self.board.game_over = True
 class Door(GameElement):
     IMAGE = "DoorClosed"
     SOLID = True
@@ -90,7 +93,9 @@ class BadGuy(GameElement):
 
 
     def update(self, dt):
-        if self.call_count % 3 == 0:
+        if self.board.game_over == True:
+            return 0
+        if self.call_count % 5 == 0:
             next_x = self.x + self.direction
 
             if next_x < 0 or next_x >= self.board.width:
@@ -104,16 +109,23 @@ class BadGuy(GameElement):
             if isinstance(character_in_path, Character):
                 character_in_path.interact(self)
 
-            self.board.del_el(self.x, self.y)
+            current_square = self.board.get_el(self.x, self.y)
+            print current_square, self
+            if current_square == self:
+                self.board.del_el(self.x, self.y)
+                saved_x = self.x
+                self.board.set_el(next_x, self.y, self)
+            else:
+                saved_x = self.x
+
+            print "update", hover, self.x, self.y, next_x
+
             if hover:
-                self.board.set_el(self.x, self.y, hover)
+                print "Hovering:" ,self.x, saved_x
+                self.board.set_el(saved_x, self.y, hover)
                 self.hover = None
             self.board.set_el(next_x, self.y, self)
         self.call_count += 1
-
-    def interact(self, player):
-        print "The player is interacting with the badguy"
-        # player.hover = self
 
 class Character(GameElement):
     IMAGE = "Girl"
@@ -131,6 +143,9 @@ class Character(GameElement):
         print "The badguy interacts with the player"
         badguy.hover = self
         print "The badguy has run into", badguy.hover
+        # at this point, the badguy would be draw "OVER" the player
+        # note this fact somewhere and the enxt time update runs, draw the character
+
         for item_index in range(len(self.inventory)):
             if isinstance(self.inventory[item_index], GreenGem):
                 del self.inventory[item_index]
@@ -152,6 +167,7 @@ class Character(GameElement):
         direction = None
         print symbol, modifier
 
+
         move_by = 1
         if modifier & key.MOD_SHIFT and self.JUMP_POWER == True:
             print "you're holding shift"
@@ -169,11 +185,16 @@ class Character(GameElement):
             sys.exit("Game over!")
         self.MOVE_COUNT += 1
 
+        if self.board.game_over == True:
+            return 0  
+
         if self.MOVE_COUNT < 30:    
-            self.board.draw_msg("[%s] moves %s" % (self.IMAGE, direction))
+            self.board.draw_msg("%s moves %s" % (self.IMAGE, direction))
         else:    
             direction = None
             self.board.draw_msg("You lost! You only get 30 keystrokes! Press Q to quit.")
+            self.board.game_over = True
+  
         if direction:
             next_location = self.next_pos(direction, move_by)
 
@@ -253,3 +274,4 @@ def initialize():
         GAME_BOARD.set_el(pos[0], pos[1], wall)
         walls.append(wall)
 
+    GAME_BOARD.game_over = False
